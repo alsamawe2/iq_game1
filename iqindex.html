@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة المسابقة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#17203a;--mute:#5d6782;--line:#d5dbe8;--btn:#17203a;--btnt:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1426;--card:#1a2140;--ink:#eef1fa;--mute:#9aa5c6;--line:#2c3560;--btn:#eef1fa;--btnt:#0f1426}}
+:root[data-theme="dark"]{--bg:#0f1426;--card:#1a2140;--ink:#eef1fa;--mute:#9aa5c6;--line:#2c3560;--btn:#eef1fa;--btnt:#0f1426}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,sans-serif;line-height:1.6}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-family:'Reem Kufi',Tahoma,sans-serif;font-size:2rem;margin:8px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 14px;font:inherit;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--c,var(--btn));border-color:var(--c,var(--btn));color:#fff}
+.chip:focus-visible,button:focus-visible{outline:3px solid #2f6fed;outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-inline-start:8px solid var(--c,var(--line));border-radius:14px;padding:22px 20px;margin:14px 0;min-height:230px}
+.tag{font-weight:700;color:var(--c,var(--mute))}
+.q{font-family:'Reem Kufi',Tahoma,sans-serif;font-size:1.65rem;line-height:1.55;margin:10px 0}
+.a{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--bg);font-size:1.4rem;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button.main{flex:1;min-width:140px;border:0;border-radius:12px;padding:14px;font:700 1.05rem Tajawal,Tahoma,sans-serif;background:var(--btn);color:var(--btnt);cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:.95rem;margin:8px 2px}
+.clk{font-family:'Reem Kufi',Tahoma,sans-serif;font-size:1.6rem;text-align:center;margin-top:10px;min-height:1.7em;color:var(--c,var(--ink))}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:14px}
+.bar i{display:block;height:100%;width:0;background:var(--c,var(--ink))}
+.meta{flex-wrap:wrap;align-items:center;gap:8px}
+select{font:inherit;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:2px 6px}
+.award{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.who{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note{min-height:1.6em;margin:8px 2px;font-weight:700}
+.players{margin-top:20px}
+.players h2{font-family:'Reem Kufi',Tahoma,sans-serif;font-size:1.3rem;margin:0 0 8px}
+.add{display:flex;gap:8px}
+.add input{flex:1;min-width:0;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.add button{flex:none;min-width:90px}
+#plist{list-style:none;margin:10px 0 0;padding:0}
+#plist li{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px}
+#plist li span{flex:1}
+#plist li b{font-family:'Reem Kufi',Tahoma,sans-serif;font-size:1.5rem}
+#plist li button{border:0;background:transparent;color:var(--mute);font-size:1.4rem;cursor:pointer;width:32px;height:32px}
+.empty{color:var(--mute)}
+.about{margin:26px 0 8px;text-align:center;color:var(--mute);font-size:.8rem}
+.about summary{cursor:pointer;display:inline-block;padding:4px 10px}
+.about p{margin:4px 0 0}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>لعبة المسابقة</h1>
+<p class="sub">المقدّم يسأل والبقية يجيبون. لا سؤال يتكرر. الجواب ظاهر تحت السؤال، ثم اختر من أجاب صح.</p>
+<div class="chips" id="chips"></div>
+<section class="card" id="card" aria-live="polite">
+  <div class="tag" id="tag">جاهز؟</div>
+  <div class="q" id="q">اختر تصنيفًا أو اترك «الكل» ثم اضغط «سؤال جديد».</div>
+  <div class="a hide" id="a"></div>
+  </section>
+<section class="award hide" id="award"><div class="tag">من أجاب بشكل صحيح؟</div><div class="who" id="who"></div></section>
+<div class="note" id="note"></div>
+<div class="row">
+  <button class="main" id="next">سؤال جديد</button>
+</div>
+<div class="meta"><span id="left"></span><button class="chip" id="reset">إعادة الأسئلة</button></div>
+<section class="players"><h2>اللاعبون</h2><div class="add"><input id="pn" placeholder="اسم اللاعب" maxlength="24"><button class="main" id="addp">إضافة</button></div><ol id="plist"></ol></section>
+<details class="about"><summary>حول</summary><p>تطوير: يوسف منصور</p></details>
+</main>
+<script>
+var C=["رياضة","جغرافيا","أدب","فنون","تاريخ","سينما"];
+var COL=["#c2410c","#0e7490","#7c3aed","#be185d","#a16207","#15803d"];
+var Q=[
+[0,"كم لاعبًا يشارك من كل فريق داخل الملعب في كرة السلة؟","5 لاعبين"],
+[0,"في أي مدينة أُقيمت أولمبياد 2016؟","ريو دي جانيرو"],
+[0,"أي رياضة يُستخدم فيها مصطلح «الضربة القاضية»؟","الملاكمة"],
+[0,"كم كيلومترًا تقريبًا هي مسافة الماراثون؟","42.195 كم"],
+[0,"ما الدولة التي نشأت فيها رياضة الجودو؟","اليابان"],
+[0,"كم حلقة في شعار الألعاب الأولمبية؟","خمس حلقات"],
+[0,"من لاعب التنس الملقّب بـ«ملك الملاعب الترابية»؟","رافائيل نادال"],
+[0,"من العدّاء صاحب الرقم القياسي في 100 متر (9.58 ثانية)؟","يوسين بولت"],
+[0,"أي مدينة استضافت أولمبياد 2020 (التي أُقيمت عام 2021)؟","طوكيو"],
+[0,"من السائق الذي يتقاسم مع شوماخر رقم 7 ألقاب في الفورمولا 1؟","لويس هاميلتون"],
+[0,"كم دقيقة مدة المباراة الرسمية في كرة القدم دون وقت إضافي؟","90 دقيقة"],
+[0,"ما الرياضة التي تُستخدم فيها الريشة بدل الكرة؟","البادمنتون (التنس الريشة)"],
+[1,"ما عاصمة اليابان؟","طوكيو"],
+[1,"ما عاصمة المغرب؟","الرباط"],
+[1,"أي دولة عربية تُلقّب بـ«بلاد الأرز»؟","لبنان"],
+[1,"ما أكبر بحيرة في العالم مساحةً؟","بحر قزوين"],
+[1,"ما الدولة الأكثر سكانًا في العالم حاليًا؟","الهند"],
+[1,"ما اسم أشهر جبل في اليابان؟","جبل فوجي"],
+[1,"ما عاصمة الأرجنتين؟","بوينس آيرس"],
+[1,"ما أصغر قارة مساحةً؟","أستراليا (أوقيانوسيا)"],
+[1,"على أي خليج يُطل العراق؟","الخليج العربي"],
+[1,"ما عاصمة إسبانيا؟","مدريد"],
+[1,"ما أطول نهر في أوروبا؟","نهر الفولغا"],
+[1,"ما عاصمة كينيا؟","نيروبي"],
+[2,"من كاتب رواية «الشيخ والبحر»؟","إرنست همنغواي"],
+[2,"من مؤلف رواية «دون كيخوته»؟","ميغيل دي ثربانتس"],
+[2,"من كاتب «الأمير الصغير»؟","أنطوان دو سانت إكزوبيري"],
+[2,"من الشاعر العراقي الملقّب بـ«شاعر العرب الأكبر»؟","محمد مهدي الجواهري"],
+[2,"من مؤلف رواية «الحرب والسلم»؟","ليو تولستوي"],
+[2,"من كاتب «مئة عام من العزلة»؟","غابرييل غارسيا ماركيز"],
+[2,"من الشاعر اليوناني صاحب «الإلياذة»؟","هوميروس"],
+[2,"من الأندلسي صاحب كتاب «طوق الحمامة»؟","ابن حزم"],
+[2,"من صاحب معجم «لسان العرب»؟","ابن منظور"],
+[2,"من مؤلف «الكتاب» في النحو؟","سيبويه"],
+[2,"من كاتب مسرحية «هاملت»؟","ويليام شكسبير"],
+[2,"من كاتب رواية «الغريب»؟","ألبير كامو"],
+[3,"من رسم لوحة «الموناليزا»؟","ليوناردو دافنشي"],
+[3,"من رسم «ليلة النجوم»؟","فان غوخ"],
+[3,"من رسم لوحة «غرنيكا»؟","بابلو بيكاسو"],
+[3,"من ألّف السيمفونية التاسعة؟","بيتهوفن"],
+[3,"ما اسم فن طي الورق الياباني؟","الأوريغامي"],
+[3,"من المطربة الملقّبة بـ«كوكب الشرق»؟","أم كلثوم"],
+[3,"من المطربة الملقّبة بـ«جارة القمر»؟","فيروز"],
+[3,"ما اسم فن الغناء العراقي التراثي الذي يؤديه قارئ المقام؟","المقام العراقي"],
+[3,"أي آلة موسيقية تُلقّب بـ«سلطان الآلات الشرقية»؟","العود"],
+[3,"من رسم لوحة «الصرخة»؟","إدفارد مونش"],
+[3,"من ألّف «الفصول الأربعة» الموسيقية؟","فيفالدي"],
+[3,"من نحت تمثال «داود» الشهير؟","مايكل أنجلو"],
+[4,"من الخليفة الراشدي الأول؟","أبو بكر الصديق"],
+[4,"من القائد المغولي الذي اجتاح بغداد عام 1258؟","هولاكو"],
+[4,"من أول رئيس للولايات المتحدة؟","جورج واشنطن"],
+[4,"في أي عام بدأت الحرب العالمية الأولى؟","1914"],
+[4,"ما اسم السفينة التي غرقت عام 1912 في رحلتها الأولى؟","تيتانيك"],
+[4,"من الملاح الذي وصل إلى أمريكا عام 1492؟","كريستوفر كولومبوس"],
+[4,"من ملكة مصر المرتبطة بيوليوس قيصر ثم مارك أنطونيو؟","كليوباترا"],
+[4,"من مؤسس الدولة العباسية؟","أبو العباس السفاح"],
+[4,"ما المدينة الرومانية التي دفنها بركان فيزوف؟","بومبي"],
+[4,"من القائد الذي عبر إلى الأندلس عام 711م؟","طارق بن زياد"],
+[4,"في أي عام اندلعت الثورة الروسية الكبرى؟","1917"],
+[4,"في أي عام ميلادي كان فتح مكة؟","630م (8 هـ)"],
+[5,"من أخرج فيلم «تيتانيك»؟","جيمس كاميرون"],
+[5,"من بطل فيلم «المصارع» (Gladiator) عام 2000؟","راسل كرو"],
+[5,"ما أشهر جائزة سينمائية تُمنح في هوليوود؟","الأوسكار"],
+[5,"في أي مدينة فرنسية يقام مهرجان «السعفة الذهبية»؟","كان"],
+[5,"من أخرج فيلم «العرّاب»؟","فرانسيس فورد كوبولا"],
+[5,"من الممثل الذي جسّد شخصية جاك في «تيتانيك»؟","ليوناردو دي كابريو"],
+[5,"ما فيلم الأنيميشن الذي بطله الأسد الصغير سيمبا؟","الأسد الملك"],
+[5,"من أخرج ثلاثية «سيد الخواتم»؟","بيتر جاكسون"],
+[5,"من أخرج الفيلم المصري «المومياء» عام 1969؟","شادي عبد السلام"],
+[5,"من الممثل المصري الملقّب بـ«الزعيم»؟","عادل إمام"],
+[5,"ما اسم الفأر الشهير في أفلام ديزني؟","ميكي ماوس"],
+[5,"من أخرج فيلم «البداية» (Inception)؟","كريستوفر نولان"]
+,[0,"كم لاعبًا في فريق الكرة الطائرة داخل الملعب؟","6 لاعبين"],
+[0,"ما اسم بطولة التنس الشهيرة التي تُقام على العشب في لندن؟","ويمبلدون"],
+[0,"من لاعب كرة السلة الأسطوري صاحب القميص رقم 23 مع شيكاغو بولز؟","مايكل جوردان"],
+[0,"أي دولة فازت بأكثر الميداليات الذهبية في تاريخ الأولمبياد الصيفي؟","الولايات المتحدة"],
+[0,"أي نادٍ كروي يُلقّب بـ«البلوغرانا»؟","برشلونة"],
+[0,"كم لاعبًا يشارك من كل فريق في الركبي (اتحاد الركبي)؟","15 لاعبًا"],
+[0,"ما اسم أشهر سباق دراجات هوائية في فرنسا؟","طواف فرنسا"],
+[0,"أي مدينة استضافت أولمبياد 2008؟","بكين"],
+[0,"ما اسم الإرسال الذي لا يستطيع الخصم لمسه في التنس؟","الإيس (Ace)"],
+[0,"أي منتخب فاز بكأس آسيا 2019؟","قطر"],
+[1,"ما عاصمة أفغانستان؟","كابل"],
+[1,"ما أعلى جبل في أمريكا الجنوبية؟","أكونكاغوا"],
+[1,"ما أكبر دولة في أمريكا الجنوبية مساحةً؟","البرازيل"],
+[1,"ما عاصمة ماليزيا؟","كوالالمبور"],
+[1,"أي دولة تُعرف بـ«بلاد الشمس المشرقة»؟","اليابان"],
+[1,"ما أكبر جزيرة في البحر المتوسط؟","صقلية"],
+[1,"ما أطول نهر في آسيا؟","اليانغتسي"],
+[1,"ما عاصمة النمسا؟","فيينا"],
+[1,"ما عاصمة ليبيا؟","طرابلس"],
+[1,"ما عاصمة سوريا؟","دمشق"],
+[2,"من كاتب رواية «البؤساء»؟","فيكتور هوغو"],
+[2,"من مؤلف رواية «مدام بوفاري»؟","غوستاف فلوبير"],
+[2,"من كاتب رواية «رجال في الشمس»؟","غسان كنفاني"],
+[2,"من كاتبة رواية «ذاكرة الجسد»؟","أحلام مستغانمي"],
+[2,"على من اشتهرت الخنساء برثائه؟","أخيها صخر"],
+[2,"من مؤلف كتاب «الشعر والشعراء»؟","ابن قتيبة"],
+[2,"من كاتب رواية «1984»؟","جورج أورويل"],
+[2,"من مؤلف كتاب «الأمير» في السياسة؟","نيكولو ميكافيلي"],
+[2,"من الشاعر التونسي صاحب «إذا الشعب يومًا أراد الحياة»؟","أبو القاسم الشابي"],
+[2,"من كاتب السيرة الروائية «الخبز الحافي»؟","محمد شكري"],
+[3,"من الفنان الإسباني الذي اشتهر بلوحة الساعات الذائبة؟","سلفادور دالي"],
+[3,"من رسم «فتاة بقرط اللؤلؤة»؟","يوهانس فيرمير"],
+[3,"من ألّف أوبرا «زواج فيغارو»؟","موتسارت"],
+[3,"من المطرب المصري الملقّب بـ«العندليب الأسمر»؟","عبد الحليم حافظ"],
+[3,"من يُعدّ واضع أصول الخط العربي المنسوب؟","ابن مقلة"],
+[3,"ما اللون الناتج عن مزج الأزرق والأصفر؟","الأخضر"],
+[3,"ما اسم الرسم الجداري على الجص الرطب؟","الفريسكو"],
+[3,"من نحت تمثال «المفكر»؟","أوغست رودان"],
+[3,"أي فرقة بريطانية غنّت «Hey Jude»؟","البيتلز"],
+[3,"ما الآلة الموسيقية ذات المفاتيح البيضاء والسوداء؟","البيانو"],
+[4,"من القائد الذي فتح مصر في عهد عمر بن الخطاب؟","عمرو بن العاص"],
+[4,"من أسس مدينة الإسكندرية؟","الإسكندر الأكبر"],
+[4,"من الخليفة العباسي المرتبط بازدهار بيت الحكمة؟","المأمون"],
+[4,"في أي عام سقطت غرناطة آخر معاقل المسلمين في الأندلس؟","1492"],
+[4,"من الإمبراطور الروماني الذي نقل العاصمة إلى بيزنطة؟","قسطنطين"],
+[4,"أي حضارة بنت الأكروبول في أثينا؟","الحضارة اليونانية"],
+[4,"من أسس الإمبراطورية المغولية؟","جنكيز خان"],
+[4,"في أي عام سقط جدار برلين؟","1989"],
+[4,"من الزعيم الهندي الملقّب بـ«المهاتما»؟","غاندي"],
+[4,"ما الإمبراطورية التي كانت عاصمتها روما؟","الإمبراطورية الرومانية"],
+[5,"من نال أوسكار أفضل ممثل عن فيلم «الجوكر» (2019)؟","خواكين فينيكس"],
+[5,"من أخرج الفيلم الكوري «الطفيلي» (Parasite)؟","بونغ جون هو"],
+[5,"من الممثلة التي جسّدت شخصية هيرميون في «هاري بوتر»؟","إيما واتسون"],
+[5,"في أي سلسلة أفلام تظهر شخصية «دارث فيدر»؟","حرب النجوم"],
+[5,"من أخرج فيلم «الفك المفترس» (Jaws)؟","ستيفن سبيلبرغ"],
+[5,"من بطل الفيلم المصري «الكيت كات»؟","محمود عبد العزيز"],
+[5,"ما اسم فيلم الأنيميشن عن سمكة تبحث عن ابنها؟","البحث عن نيمو"],
+[5,"من الممثل الذي جسّد شخصية «جاك سبارو»؟","جوني ديب"],
+[5,"من الممثلة الملقّبة بـ«سيدة الشاشة العربية»؟","فاتن حمامة"],
+[5,"ما فيلم جيمس كاميرون الذي تدور أحداثه على كوكب باندورا؟","أفاتار"]
+,[3,"من صمّم برج إيفل؟","غوستاف إيفل (شركته)"],
+[3,"ما الرقصة الإسبانية المرتبطة بالغيتار والكاستانيت؟","الفلامنكو"],
+[3,"من صمّم مبنى دار أوبرا سيدني؟","يورن أوتزون"],
+[3,"ما اسم المسرح اللندني الشهير المرتبط بشكسبير؟","مسرح غلوب"],
+[3,"من العالم العربي الذي درس البصريات والكاميرا المظلمة في «كتاب المناظر»؟","ابن الهيثم"],
+[3,"أي طراز معماري تميّز بالأقواس المدببة والنوافذ الملونة في الكاتدرائيات؟","الطراز القوطي"],
+[3,"ما اسم الخط العربي ذو الحروف الهندسية المربعة؟","الخط الكوفي"],
+[3,"ما اسم الفن المسرحي الذي تُغنّى فيه الحوارات مع موسيقى أوركسترا؟","الأوبرا"],
+[3,"من مؤسسة دار الأزياء الفرنسية «شانيل»؟","كوكو شانيل"],
+[3,"ما أشهر متحف في باريس ويضم الموناليزا؟","متحف اللوفر"],
+[3,"من رسم سقف كنيسة سيستينا؟","مايكل أنجلو"],
+[3,"من أي بلد نشأت رقصة التانغو؟","الأرجنتين (وأوروغواي)"],
+[3,"من الفنان العراقي صاحب «نصب الحرية» في بغداد؟","جواد سليم"],
+[3,"من المعمارية العراقية الحائزة جائزة بريتزكر؟","زها حديد"],
+[3,"ما اسم فن الزخرفة النباتية والهندسية المتكررة في العمارة الإسلامية؟","الأرابيسك"],
+[3,"ما اسم الآلة الإيقاعية الجلدية الشرقية التي تُعرف بـ«الدربكة»؟","الطبلة"]
+];
+var filter=-1,used={},cur=-1,shownA=false;
+var $=function(i){return document.getElementById(i)};
+function pool(){var p=[];for(var i=0;i<Q.length;i++){if(!used[i]&&(filter<0||Q[i][0]===filter))p.push(i)}return p}
+function paint(c){$("card").style.setProperty("--c",c)}
+function counter(){$("left").textContent="المتبقي: "+pool().length+" سؤال"}
+var players=[],awarded=false;
+function nextQ(){
+  awarded=false;$("award").classList.add("hide");$("note").textContent="";
+  var p=pool();
+  if(!p.length){cur=-1;$("tag").textContent="انتهت الأسئلة";paint("");$("q").textContent="لا توجد أسئلة جديدة في هذا التصنيف. اضغط «إعادة الأسئلة» أو غيّر التصنيف.";$("a").classList.add("hide");counter();return}
+  cur=p[Math.floor(Math.random()*p.length)];used[cur]=true;
+  var x=Q[cur];$("tag").textContent=C[x[0]];paint(COL[x[0]]);$("q").textContent=x[1];$("a").textContent=x[2];
+  $("a").classList.remove("hide");$("next").textContent="السؤال التالي";counter();
+  if(players.length)$("award").classList.remove("hide");
+}
+$("next").onclick=nextQ;
+$("reset").onclick=function(){used={};cur=-1;awarded=false;$("award").classList.add("hide");$("note").textContent="";$("tag").textContent="جاهز؟";paint("");$("q").textContent="تمت إعادة كل الأسئلة. اضغط «سؤال جديد».";$("a").classList.add("hide");$("next").textContent="سؤال جديد";counter()};
+(function(){
+  var names=["الكل"].concat(C),h="";
+  names.forEach(function(n,i){h+='<button class="chip" aria-pressed="'+(i===0)+'" data-i="'+(i-1)+'"'+(i>0?' style="--c:'+COL[i-1]+'"':'')+'>'+n+'</button>'});
+  $("chips").innerHTML=h;
+  $("chips").onclick=function(e){var b=e.target.closest(".chip");if(!b)return;filter=+b.dataset.i;
+    [].forEach.call($("chips").children,function(c){c.setAttribute("aria-pressed",c===b)});counter()};
+function esc(t){return t.replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function renderP(){
+    var o=players.map(function(_,i){return i}).sort(function(a,b){return players[b].s-players[a].s});
+    var h="",w="";
+    o.forEach(function(i){h+='<li><span>'+esc(players[i].n)+'</span><b>'+players[i].s+'</b><button data-r="'+i+'" aria-label="حذف اللاعب">×</button></li>'});
+    players.forEach(function(p,i){w+='<button class="chip" data-w="'+i+'">'+esc(p.n)+'</button>'});
+    w+='<button class="chip" data-w="x">لا أحد</button>';
+    $("plist").innerHTML=h||'<li class="empty">أضف أسماء اللاعبين ليبدأ احتساب النقاط.</li>';
+    $("who").innerHTML=w;
+    if(cur>=0&&!$("a").classList.contains("hide")&&!awarded&&players.length)$("award").classList.remove("hide");
+  }
+  function addP(){var n=$("pn").value.trim();if(!n)return;players.push({n:n,s:0});$("pn").value="";renderP()}
+  $("addp").onclick=addP;$("pn").onkeydown=function(e){if(e.key==="Enter")addP()};
+  $("plist").onclick=function(e){var b=e.target.closest("button");if(!b)return;players.splice(+b.dataset.r,1);renderP()};
+  $("who").onclick=function(e){var b=e.target.closest("button");if(!b)return;awarded=true;$("award").classList.add("hide");
+    if(b.dataset.w==="x"){$("note").textContent="لم تُمنح نقطة."}else{var p=players[+b.dataset.w];p.s++;$("note").textContent="نقطة لـ "+p.n;renderP()}};
+  renderP();
+  counter();
+})();
+</script>
+</body>
+</html>
